@@ -8,15 +8,17 @@ import time
 
 def make_env():
     def _init():
-        env = gym.make("highway-v0", disable_env_checker=True)
-        env.unwrapped.configure({
-            "observation": {"type": "Kinematics"},
+        env = gym.make("highway-v0", disable_env_checker=False)
+        config = {
+            "observation": {"type": "LidarObservation", "cells": 32, "maximum_range": 100},
             "simulation_frequency": 10,
             "policy_frequency": 2,
             "duration": 40,
             "vehicles_count": 20,
-        })
-        env = Monitor(env)  # Enables episode reward/length logging
+        }
+        env.unwrapped.configure(config)
+        env.reset()  # Make sure configuration takes effect
+        env = gym.wrappers.RecordEpisodeStatistics(env)
         return env
     return _init
 
@@ -46,3 +48,4 @@ if __name__ == "__main__":
     print("Model saved as dqn_highway_fast.zip")
 
     env.close()
+
