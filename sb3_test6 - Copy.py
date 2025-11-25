@@ -92,9 +92,9 @@ class ProgressiveTrafficWrapper(gym.Wrapper):
         new_config = {
             "observation": {
                 "type": "LidarObservation",
-                "cells": 64,
-                "maximum_range": 200,
-                "normalize": True,
+                "cells": 128,
+                "maximum_range": 64,
+                "normalise": True,
             },
             "vehicles_count": self.current_vehicles,
         }
