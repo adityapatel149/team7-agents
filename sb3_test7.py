@@ -155,7 +155,7 @@ if __name__ == "__main__":
     print("🚀 Starting (or resuming) PPO training...")
     callback = ResetExplorationCallback(env) 
     model.learn(
-        total_timesteps=2_000_000,
+        total_timesteps=1_000_000,
         reset_num_timesteps=False,
         tb_log_name="PPO_highway_curriculum",
         callback=callback,
@@ -167,3 +167,4 @@ if __name__ == "__main__":
 
     # Clean up
     env.close()
+
