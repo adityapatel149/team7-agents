@@ -2,13 +2,14 @@ import gymnasium as gym
 import custom_env 
 import numpy as np
 from sb3_contrib import TRPO
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 MODEL_PATH = "./models/trpo_team7_lidar.zip"   # path to trained model
 
 def make_eval_env(render: bool = False,):
     """
     Create a single Team7-v0 environment for evaluation.
-    Uses the same config as training.
     """
     render_mode = "human" if render else None
 
@@ -25,7 +26,7 @@ def evaluate(model_path, episodes=10, render=False):
     print(f"Loading model from: {model_path}")
     model = TRPO.load(model_path, device="cpu")
 
-    env = make_eval_env(True)
+    env = make_eval_env(render)
     episode_rewards = []
 
     for ep in range(episodes):
@@ -54,6 +55,37 @@ def evaluate(model_path, episodes=10, render=False):
     print(f"Min / Max  : {np.min(episode_rewards):.2f} / {np.max(episode_rewards):.2f}")
     print("=============================\n")
 
+    return episode_rewards
+
+def plot_violin(reward_list, title="TRPO Reward Distribution", save_path=None):
+
+    """
+    Create a violin plot from a list of episode rewards.
+    """
+    # plt.figure(figsize=(8, 6))
+    # plt.violinplot(data=reward_list, inner="quartile", color="skyblue")
+    # plt.title(title, fontsize=14)
+    # plt.ylabel("Episode Reward", fontsize=12)
+    # plt.xticks([])
+    plt.violinplot(reward_list)
+    plt.title(f"TRPO Rewards over 500 Episodes") 
+    plt.ylabel("Total Reward")
+    plt.savefig(f"TRPO_rewards_violin_plot.png")
+    plt.show()
+
+    # if save_path:
+    #     plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    #     print(f"Violin plot saved to {save_path}")
+
+    # plt.show()
+
+
 
 if __name__ == "__main__":
-    evaluate(MODEL_PATH, episodes=10, render=True)
+    rewards = evaluate(MODEL_PATH, episodes=50, render=False)
+
+    plot_violin(
+        rewards,
+        title="TRPO: Episode Reward Distribution (500 Episodes)",
+        save_path="trpo_violin_plot.png"
+    )
