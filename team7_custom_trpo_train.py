@@ -13,10 +13,6 @@ import os
 
 
 def make_env(env_id: int):
-    """
-    Factory function to create Team7-v0 environment with LidarObservation.
-    Each environment gets a unique ID for subprocess isolation.
-    """
     def _init():
         
         env = gym.make("Team7-v0", disable_env_checker=False)
@@ -30,15 +26,15 @@ def make_env(env_id: int):
             },
             "action": {
                 "type": "DiscreteMetaAction",
-                "vehicle_class": "custom_env.vehicle.customvehicle.CustomVehicle",  # ADDED: Your custom vehicle
+                "vehicle_class": "custom_env.vehicle.customvehicle.CustomVehicle",  # ADDED custom vehicle
             },
             "lanes_count": 7, #reduced to 7 from 8
             "vehicles_count": 20, #reduced to 20 from 40
             "controlled_vehicles": 1,
             "initial_lane_id": None,  # Random initial lane
             "duration": 30,  # [s]
-            "ego_spacing": 2,  # ADDED: Spacing for ego vehicle
-            "vehicles_density": 3,  # ADDED: Vehicle density parameter
+            "ego_spacing": 2,  # Spacing for ego vehicle
+            "vehicles_density": 3,  # Vehicle density parameter
             "collision_reward": -1,
             "right_lane_reward": 0.1,
             "lane_change_reward": 0,
@@ -46,8 +42,8 @@ def make_env(env_id: int):
             "speed_limit": 50,
             "reward_speed_range": [25, 50],
             "normalize_reward": True,
-            "offroad_terminal": False,  # ADDED: Don't terminate on offroad
-            "other_vehicles_type": "highway_env.vehicle.behavior.SuddenBrakingVehicle",  # ADDED: Your custom vehicle type
+            "offroad_terminal": False,  # Don't terminate on offroad
+            "other_vehicles_type": "highway_env.vehicle.behavior.SuddenBrakingVehicle",  # ADDED custom vehicle type
             "anomaly_interval": 3,  # Ghost vehicle anomaly interval
             "potholes": {
                 "enabled": True,
@@ -69,16 +65,8 @@ def make_env(env_id: int):
 
 
 def main():
-    print("="*70)
     print("TRPO Training on Team7-v0 Custom Environment")
-    print("="*70)
     print("Environment Features:")
-    print("  - Potholes: Slow down vehicles on contact")
-    print("  - SuddenBrakingVehicles: Random hard braking")
-    print("  - GhostVehicles: Sensor anomalies (teleport, flicker, speed)")
-    print("  - Observation: LidarObservation (32 cells, 100m range)")
-    print("  - Algorithm: TRPO (Trust Region Policy Optimization)")
-    print("="*70)
     
     # Configuration
     NUM_ENVS = 4 
@@ -107,7 +95,7 @@ def main():
     try:
         print(f"\nAttempting to load existing model from {model_path}...")
         model = TRPO.load(model_path, env=env, device="cpu")
-        print("✓ Model loaded successfully! Continuing training...")
+        print("Model loaded successfully! Continuing training...")
     except FileNotFoundError:
         print("No existing model found. Creating new model...")
     except Exception as e:
@@ -139,15 +127,12 @@ def main():
             device="cpu",
             tensorboard_log=TB_LOG_DIR
         )
-        print("✓ Model created successfully")
+        print("Model created successfully")
     
     # Train
-    print("\n" + "="*70)
     print("Starting TRPO training...")
-    print("="*70)
     print("Monitor training progress:")
     print(f"  tensorboard --logdir={TB_LOG_DIR}")
-    print("="*70)
     
     start_time = time.time()
     
@@ -166,12 +151,9 @@ def main():
     save_path = f"./models/{MODEL_NAME}"
     model.save(save_path)
     
-    print("\n" + "="*70)
     print("Training Complete!")
-    print("="*70)
     print(f"Training time: {elapsed/60:.1f} minutes ({elapsed:.0f} seconds)")
     print(f"Model saved as: {save_path}.zip")
-    print("="*70)
     
     # Cleanup
     env.close()

@@ -20,7 +20,7 @@ def make_eval_env(render: bool = False,):
     return env
 
 
-def evaluate(model_path, episodes=10, render=False):
+def evaluate(model_path, episodes=150, render=False):
     print("   TRPO MODEL EVALUATION")
 
     print(f"Loading model from: {model_path}")
@@ -53,7 +53,6 @@ def evaluate(model_path, episodes=10, render=False):
     print(f"Mean reward: {np.mean(episode_rewards):.2f}")
     print(f"Std  reward: {np.std(episode_rewards):.2f}")
     print(f"Min / Max  : {np.min(episode_rewards):.2f} / {np.max(episode_rewards):.2f}")
-    print("=============================\n")
 
     return episode_rewards
 
@@ -82,7 +81,7 @@ def plot_violin(reward_list, title="TRPO Reward Distribution", save_path=None):
 
 
 if __name__ == "__main__":
-    rewards = evaluate(MODEL_PATH, episodes=50, render=False)
+    rewards = evaluate(MODEL_PATH, episodes=500, render=True)
 
     plot_violin(
         rewards,
