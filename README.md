@@ -1,6 +1,6 @@
 # Team 7 Agents
 
-This repository contains **reinforcement learning agents** developed by **Team 7** for the CS271: Reinforcement Learning course (San José State University).  
+This repository contains **reinforcement learning agents** developed by **Team 7** for the CS272: Reinforcement Learning course (San José State University).  
 Agents here are trained and evaluated primarily on our custom Highway-Env–based environment, `Team7-v0`, and compared against agents running in another team’s (Team 8’s) custom environment.
 
 ---
