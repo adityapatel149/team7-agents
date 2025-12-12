@@ -38,11 +38,7 @@ Contains **training scripts**.
 
 ### `tb_logs/`
 Contains **TensorBoard logs**.  
-Run:
-```bash
-tensorboard --logdir tb_logs
-```
----
+
 
 ## 👥 Authors
 
