@@ -11,7 +11,7 @@ Agents here are trained and evaluated primarily on our custom Highway-Env–base
   👉 https://github.com/adityapatel149/team7-custom-env  
 
 - **Team 8 Custom Environment – other team**  
-  👉 *Team 8 custom env link here*  
+  👉 https://github.com/chiragr15/CS272_CustomNarrow_Env  
 
 ---
 
