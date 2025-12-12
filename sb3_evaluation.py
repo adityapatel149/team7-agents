@@ -2,15 +2,15 @@ import argparse
 import time
 
 import gymnasium as gym
-import highway_env  # noqa: F401  # registers merge-v0 and others
+import highway_env  # noqa: F401  # registers intersection-v0 and others
 
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 from sb3_contrib import TRPO
-
+from matplotlib import pyplot as plt
 
 def make_eval_env(action_type: str, obs_type: str):
     """
-    Create a single merge-v0 environment for evaluation with rendering.
+    Create a single intersection-v0 environment for evaluation with rendering.
 
     action_type:
         - "DiscreteMetaAction"
@@ -21,19 +21,19 @@ def make_eval_env(action_type: str, obs_type: str):
         - "gray"   -> GrayscaleObservation
     """
     # Render to screen during eval
-    env = gym.make("merge-v0", disable_env_checker=False, render_mode="human")
+    env = gym.make("intersection-v1", disable_env_checker=False, render_mode="human")
 
     # Choose observation config
     if obs_type == "lidar":
         obs_config = {
             "type": "LidarObservation",
-            "cells": 32,
+            "cells": 128,
             "maximum_range": 120,
         }
     else:  # obs_type == "gray"
         obs_config = {
             "type": "GrayscaleObservation",
-            "observation_shape": (84, 84),
+            "observation_shape": (5, 5),
             "stack_size": 4,
             "weights": [0.2989, 0.5870, 0.1140],
             "scaling": 1.0,
@@ -44,14 +44,7 @@ def make_eval_env(action_type: str, obs_type: str):
         "action": {"type": action_type},
         "simulation_frequency": 15,
         "policy_frequency": 1,
-        "duration": 40,
-        "vehicles_count": 15,
-        "collision_reward": -5.0,
-        "high_speed_reward": 0.5,
-        "lane_change_reward": -0.1,
-        "reward_speed_range": [30, 40],
-        "right_lane_reward": 0.0,
-        "reward_acceleration": -0.05,
+        "duration": 40,        
     }
 
     env.unwrapped.configure(config)
@@ -63,8 +56,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--algo",
-        choices=["dqn", "trpo"],
-        default="trpo",
+        choices=["dqn", "trpo","ppo"],
+        default="ppo",
         help="Which algorithm was used: dqn or trpo.",
     )
     parser.add_argument(
@@ -82,7 +75,7 @@ def main():
     parser.add_argument(
         "--episodes",
         type=int,
-        default=10,
+        default=500,
         help="Number of evaluation episodes to run.",
     )
     args = parser.parse_args()
@@ -95,15 +88,22 @@ def main():
 
     # Figure out model path (must match train script naming)
     if args.algo == "dqn":
-        model_path = f"dqn_merge_{args.action}_{args.obs}.zip"
+        model_path = f"dqn_intersection_{args.action}_{args.obs}.zip"
+    elif args.algo == "ppo":
+        model_path = f"ppo_intersection_{args.action}_{args.obs}.zip"
     else:
-        model_path = f"trpo_merge_{args.action}_{args.obs}.zip"
+        model_path = f"trpo_intersection_{args.action}_{args.obs}.zip"
+    #model_path = "model.zip"
 
     print(f"Loading model from {model_path} ...")
     if args.algo == "dqn":
         model = DQN.load(model_path, device="cpu")
+    elif args.algo == "ppo":
+        model = PPO.load(model_path, device="cpu")
     else:
         model = TRPO.load(model_path, device="cpu")
+    
+    #model = PPO.load(model_path, device="cpu")
     print("Model loaded.")
 
     # Create evaluation environment
@@ -113,7 +113,7 @@ def main():
     episode_lengths = []
 
     print(
-        f"Evaluating {args.algo.upper()} on merge-v0 "
+        f"Evaluating {args.algo.upper()} on intersection-v0 "
         f"(action={action_type}, obs={args.obs}) for {args.episodes} episodes..."
     )
 
@@ -149,6 +149,13 @@ def main():
 
     env.close()
 
+
+    #generate violin plot for 500 episodes
+    plt.violinplot(total_rewards,vert=True,showmeans=False,showmedians=True,showextrema=True)
+    plt.title(f"{args.algo.upper()} Rewards over {args.episodes} Episodes") 
+    plt.ylabel("Total Reward")
+    plt.savefig(f"{args.algo}_rewards_violin_plot.png")
+    plt.show()
 
 if __name__ == "__main__":
     main()
